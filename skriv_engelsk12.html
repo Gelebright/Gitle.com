@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Write it! – type what you see</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;800&family=Atkinson+Hyperlegible:wght@400;700&display=swap">
+<style>
+:root{
+  --bg:#fbf6ea; --card:#fff; --text:#1c2540; --muted:#5d6580; --accent:#ff5d4a; --accent-ink:#fff; --blue:#2f5bff; --line:#e3dcc9; --good:#16864a; --bad:#d6293e; --badbg:#ffe1e4;
+  --head:'Bricolage Grotesque','Trebuchet MS',sans-serif; --body:'Atkinson Hyperlegible',Verdana,sans-serif;
+  color-scheme:light; box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#121829; --card:#1b2340; --text:#f3efe4; --muted:#a9b0c9; --accent:#ff7a69; --accent-ink:#1a0a07; --blue:#8fa8ff; --line:#2d3860; --good:#5fdc95; --bad:#ff8a98; --badbg:#4a2230; color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#121829; --card:#1b2340; --text:#f3efe4; --muted:#a9b0c9; --accent:#ff7a69; --accent-ink:#1a0a07; --blue:#8fa8ff; --line:#2d3860; --good:#5fdc95; --bad:#ff8a98; --badbg:#4a2230; color-scheme:dark}
+html{height:100%;scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;background:var(--bg);color:var(--text);font:18px/1.6 var(--body)}
+:focus-visible{outline:3px solid var(--blue);outline-offset:3px}
+.wrap{max-width:720px;margin:0 auto;padding:40px 20px 64px}
+h1{font:800 clamp(2.8rem,10vw,5rem)/.95 var(--head);margin:0 0 12px;letter-spacing:-.02em}
+h1 span{color:var(--accent)}
+.lead{color:var(--muted);margin:0 0 28px;font-size:1.15rem}
+.card{background:var(--card);border:2px solid var(--line);border-radius:20px;padding:24px}
+.btn{display:inline-block;padding:13px 26px;border-radius:999px;font:700 1rem var(--body);border:2px solid var(--accent);background:var(--accent);color:var(--accent-ink);cursor:pointer}
+.btn:hover{filter:brightness(1.06)}
+.levels{display:grid;gap:12px;margin-top:16px}
+.levels .btn{text-align:left;border-radius:16px;background:var(--card);color:var(--text);border-color:var(--line);display:block}
+.levels .btn:hover{border-color:var(--blue)}
+.levels small{display:block;font-weight:400;color:var(--muted)}
+.top{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;color:var(--muted);margin-bottom:16px}
+.top b{color:var(--text)}
+.prog{height:8px;background:var(--line);border-radius:4px;overflow:hidden;margin-bottom:20px}
+.prog i{display:block;height:100%;background:var(--blue);width:0;transition:width .3s}
+.target{font:500 1.6rem/1.5 var(--head);margin:0 0 6px;word-break:break-word;user-select:none}
+.target .ok{color:var(--good)}
+.target .bad{color:var(--bad);background:var(--badbg);border-radius:3px}
+.target .cur{border-bottom:3px solid var(--blue)}
+.no{color:var(--muted);margin:0 0 18px;font-size:.95rem}
+input{width:100%;padding:14px;border-radius:14px;border:2px solid var(--line);background:var(--bg);color:var(--text);font:inherit;font-size:1.2rem}
+input:focus{border-color:var(--blue);outline:none}
+.fb{margin-top:18px;border-top:2px dashed var(--line);padding-top:16px}
+.stats{display:flex;gap:28px;flex-wrap:wrap;margin:0 0 14px}
+.stats b{display:block;font:800 1.7rem var(--head);color:var(--good)}
+.stats span{color:var(--muted);font-size:.9rem}
+[hidden]{display:none!important}
+.nav{display:flex;align-items:center;gap:8px;margin-bottom:20px;flex-wrap:wrap}
+.tab{background:none;border:0;border-bottom:3px solid transparent;color:var(--muted);font:700 1.05rem var(--body);padding:8px 14px;cursor:pointer}
+.tab[aria-selected="true"]{color:var(--accent);border-bottom-color:var(--accent)}
+.coins{margin-left:auto;font:800 1.2rem var(--head);background:var(--card);border:2px solid var(--line);border-radius:999px;padding:4px 16px}
+.badges{font-size:1.5rem;letter-spacing:4px;margin:0 0 20px;min-height:1.5em}
+.shop{display:grid;gap:14px}
+.item{display:flex;gap:16px;align-items:center;background:var(--card);border:2px solid var(--line);border-radius:18px;padding:16px}
+.item .ic{font-size:2.2rem}
+.item .tx{flex:1}.item .tx b{font:500 1.2rem var(--head)}.item .tx p{margin:0;color:var(--muted);font-size:.95rem}
+.item.own{border-color:var(--good)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.sec{font:500 1.3rem var(--head);color:var(--accent);margin:26px 0 4px}.sec:first-child{margin-top:0}
+input[type=range]{padding:0;border:0;background:none;accent-color:var(--accent);height:28px}
+.set h3{font:500 1.3rem var(--head);color:var(--accent);margin:0 0 12px}
+.set+.set{margin-top:16px}
+.opts{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px}
+.opt{padding:10px 18px;border-radius:999px;border:2px solid var(--line);background:var(--bg);color:var(--text);font:700 1rem var(--body);cursor:pointer}
+.opt[aria-pressed="true"]{border-color:var(--accent);color:var(--accent)}
+.msg{margin:10px 0 0;min-height:1.6em;color:var(--muted)}
+.mult{font-size:.8rem;color:var(--muted);font-weight:400;margin-left:6px}
+.stage{font:500 1.2rem var(--head);margin:20px 0 10px;color:var(--accent)}
+.lessons{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:12px}
+.tile{position:relative;display:flex;flex-direction:column;align-items:center;text-align:center;gap:4px;padding:28px 8px 12px;min-height:150px;border:2px solid var(--line);border-radius:16px;background:var(--card);color:var(--text);font:inherit;cursor:pointer}
+.tile:hover:not(:disabled){border-color:var(--blue)}
+.tile:disabled{opacity:.55;cursor:not-allowed}
+.tile .num{position:absolute;top:8px;left:12px;font:800 1rem var(--head);color:var(--muted)}
+.tile .ico{font-size:2rem;line-height:1.2}
+.tile .ttl{font-weight:700;font-size:.9rem;line-height:1.25}
+.tile .st{color:var(--accent);letter-spacing:1px;font-size:.95rem;margin-top:auto}
+.tile .chk{position:absolute;top:6px;right:12px;color:var(--good);font-weight:800}
+.tile.plat{border-color:var(--blue);box-shadow:inset 0 0 0 2px var(--blue)}
+.endst{font-size:1.2rem;margin:0 0 10px}
+.lb{list-style:none;padding:0;margin:14px 0 0}
+.lb li{display:flex;gap:12px;align-items:center;padding:10px 8px;border-bottom:1px solid var(--line)}
+.lb li.me{background:var(--bg);border-radius:8px}
+.lb .rk{width:2em;font:800 1rem var(--head);color:var(--muted)}
+.lb .nm{flex:1;font-weight:700;word-break:break-word}
+.lb .sc{color:var(--muted);font-size:.9rem;text-align:right}
+.lb .rm{border:0;background:none;color:var(--bad);cursor:pointer;font-size:1rem}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Write <span>it!</span></h1>
+  <p class="lead">Type the sentence shown on screen exactly as it is written. Correct letters turn green, mistakes turn red.</p>
+
+  <div class="nav" role="tablist">
+    <button class="tab" role="tab" id="t-g" aria-selected="true" data-tab="g">Play</button>
+    <button class="tab" role="tab" id="t-s" aria-selected="false" data-tab="s">Shop</button>
+    <button class="tab" role="tab" id="t-t" aria-selected="false" data-tab="t">Settings</button>
+    <button class="tab" role="tab" id="t-l" aria-selected="false" data-tab="l">Leaderboard</button>
+    <button class="tab" role="tab" id="t-a" aria-selected="false" data-tab="a" hidden>Admin</button>
+    <span class="coins" title="Your points">🪙 <span id="coins">0</span><span class="mult" id="mult"></span></span>
+  </div>
+  <div class="badges" id="badges" aria-label="Your milestones"></div>
+
+  <div id="p-g" role="tabpanel">
+  <div class="card" id="start">
+    <b>Choose a lesson</b>
+    <div class="levels" id="levels"></div>
+  </div>
+
+  <div class="card" id="game" hidden>
+    <div class="top"><span>Round <b id="rn"></b></span><span>Points <b id="pts">0</b></span></div>
+    <div class="prog"><i id="bar"></i></div>
+    <p class="target" id="target" lang="en" aria-live="off"></p>
+    <input id="ans" type="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" lang="en" aria-label="Type the sentence here" placeholder="Start typing here…">
+    <div class="fb" id="fb" hidden>
+      <div class="stats">
+        <div><b id="s1"></b><span>points</span></div>
+        <div><b id="s2"></b><span>words per minute</span></div>
+        <div><b id="s3"></b><span>mistakes</span></div>
+      </div>
+      <button class="btn" id="next">Next sentence</button>
+    </div>
+  </div>
+
+  <div class="card" id="end" hidden>
+    <div class="target">Done!</div>
+    <div class="stats">
+      <div><b id="e1"></b><span>points earned</span></div>
+      <div><b id="e2"></b><span>words per minute</span></div>
+      <div><b id="e3"></b><span>accuracy</span></div>
+    </div>
+    <p class="endst" id="e4"></p>
+    <p id="verdict"></p>
+    <button class="btn" id="again">Play again</button>
+  </div>
+  </div>
+
+  <div id="p-s" role="tabpanel" hidden>
+    <p class="lead">Spend the points you have earned on levels, upgrades and milestones. You earn points for every sentence you type.</p>
+    <div class="shop" id="shop"></div>
+  </div>
+
+  <div id="p-t" role="tabpanel" hidden>
+    <div class="card set">
+      <h3>Music</h3>
+      <div class="opts" id="tracks"></div>
+      <div class="opts"><button class="btn" id="mtog">Play music</button></div>
+      <label for="vol">Volume</label>
+      <input type="range" id="vol" min="0" max="100" value="40">
+    </div>
+    <div class="card set">
+      <h3>Redeem a code</h3>
+      <p style="margin:0 0 12px;color:var(--muted)">Enter a code to get points. Codes are long and hard to guess, and each code can only be used once. After three wrong tries you have to wait a little.</p>
+      <input type="text" id="code" placeholder="Type your code here" autocomplete="off" autocapitalize="characters" spellcheck="false" aria-label="Code">
+      <div class="row2" style="margin-top:12px"><button class="btn" id="redeem">Redeem</button></div>
+      <p class="msg" id="cmsg" role="status"></p>
+    </div>
+  </div>
+  <div id="p-l" role="tabpanel" hidden>
+    <div class="card set">
+      <h3>Leaderboard</h3>
+      <p id="lbinfo" style="margin:0 0 12px;color:var(--muted)">Choose a nickname and join to appear on the shared leaderboard. Players are ranked by total points earned.</p>
+      <div class="opts"><input type="text" id="nick" maxlength="16" placeholder="Choose a nickname" style="max-width:260px" autocomplete="off" aria-label="Nickname"><button class="btn" id="join">Join</button></div>
+      <p class="msg" id="lbmsg" role="status"></p>
+      <ol class="lb" id="lblist"></ol>
+    </div>
+  </div>
+
+  <div id="p-a" role="tabpanel" hidden>
+    <div class="card set">
+      <h3>Admin panel</h3>
+      <p id="astat" style="margin:0 0 12px;color:var(--muted)"></p>
+      <div class="opts"><input type="number" id="aamt" value="1000" min="0" style="max-width:160px" aria-label="Points to add"><button class="btn" id="aadd">Add points</button></div>
+      <div class="opts"><button class="btn" id="aunl">Unlock everything</button><button class="btn" id="astr">5 stars everywhere</button><button class="btn" id="arst">Reset progress</button></div>
+      <p class="msg" id="amsg" role="status"></p>
+    </div>
+    <div class="card set">
+      <h3>Code generator</h3>
+      <p style="margin:0 0 12px;color:var(--muted)">Make the line for a new redeem code. It only works in the game once it has been added to the code list in the page source.</p>
+      <input type="text" id="gcode" placeholder="NEW-CODE-HERE" autocomplete="off" spellcheck="false" aria-label="New code">
+      <input type="number" id="gpts" value="500" min="1" style="margin-top:10px" aria-label="Points for the code">
+      <div style="margin-top:12px"><button class="btn" id="ggen">Generate</button></div>
+      <input type="text" id="gout" readonly placeholder="Result" style="margin-top:12px" aria-label="Generated line">
+    </div>
+    <div class="card set"><button class="btn" id="alock">Lock admin panel</button></div>
+  </div>
+</div>
+
+<script>
+var S=[["I like to read books.","She has a red bike.","We go to school by bus.","The cat sleeps on the sofa.","My brother plays football.","It is cold today."],["I've never been to London, but I'd love to go.","Could you please turn the music down?","After dinner, we usually take a walk.","He didn't know where his keys were.","If it rains tomorrow, we'll stay at home.","They're waiting for the train at the station."],["Despite the weather, thousands of people attended the festival.","Technology has fundamentally changed the way we communicate.","Although he was exhausted, he refused to give up.","Environmental problems require international cooperation.","She wondered whether the decision was entirely necessary.","The committee's recommendations were thoroughly discussed."],["On March 14th, 2024, the company reported a profit of $2.5 million.","\"Where are you going?\" she asked, looking worried.","Between 1990 and 2010, the population grew by nearly 30%.","Meet me at 7:45 p.m. outside the library, and don't be late!","Her flight (number BA-208) was delayed by three hours."],["The weather was terrible; nevertheless, we enjoyed the trip. It had been a long time since we last travelled together.","Learning a language requires patience. Mistakes are simply a natural part of the process.","The museum, which opened in 1925, attracts visitors from all over the world. Admission is free on Sundays.","She had hoped to finish earlier. However, unexpected difficulties delayed the entire project.","Whenever he felt nervous, he took a deep breath. It always helped him concentrate."],["The phenomenon of bioluminescence, which occurs in many deep-sea creatures, remains poorly understood.","Surprisingly, the pharmaceutical company's quarterly earnings exceeded every analyst's expectations.","The archaeologists meticulously excavated the ancient settlement, uncovering extraordinary artefacts.","Throughout the negotiations, the delegates remained unwilling to compromise on fundamental questions.","Accommodation, necessary equipment, and entrance fees are included in the price."]];
+var M=[['🌱','First Step','You have started your journey.',20],['✏️','Wordsmith','Your English keeps getting better.',50],['⌨️','Keyboard Hero','Your fingers fly across the keys.',120],['🚀','Speed Typist','You type fast and with confidence.',250],['🏆','Language Master','Few are as good as you.',500],['👑','Legend','You have bought everything. Respect!',1000]];
+var LVL=[['Beginner','Short, simple sentences',0,1],['Intermediate','Commas and apostrophes',40,1.5],['Advanced','Long sentences and difficult words',100,2],['Expert','Numbers, quotes and punctuation',250,3],['Master','Two sentences at a time',500,4],['Legend','Hard words and long sentences',1000,6]];
+var INC=[['💰','Extra Pocket Money','Your points are doubled (×2).',100,2],['💎','Smart Investor','Your points are tripled (×3).',300,3],['🏦','Points Tycoon','Your points are multiplied by five (×5).',800,5]];
+var nick='',earned=0,elite=false,stars={},kk=0,codesUsed=[],trk=0,vol=40,coins=0,owned=[],ownedLv=[0],inc=0,raw=0;
+try{coins=+localStorage.getItem('wi_coins')||0;owned=JSON.parse(localStorage.getItem('wi_owned')||'[]');ownedLv=JSON.parse(localStorage.getItem('wi_lv')||'[0]');inc=+localStorage.getItem('wi_inc')||0;codesUsed=JSON.parse(localStorage.getItem('wi_codes')||'[]');trk=+localStorage.getItem('wi_trk')||0;stars=JSON.parse(localStorage.getItem('wi_stars')||'{}');elite=localStorage.getItem('wi_elite')==='1';nick=localStorage.getItem('wi_nick')||'';earned=+localStorage.getItem('wi_earned')||0;vol=localStorage.getItem('wi_vol')===null?40:+localStorage.getItem('wi_vol')}catch(e){}
+function mult(){return inc?INC[inc-1][4]:1}
+function save(){try{localStorage.setItem('wi_coins',coins);localStorage.setItem('wi_owned',JSON.stringify(owned));localStorage.setItem('wi_lv',JSON.stringify(ownedLv));localStorage.setItem('wi_inc',inc);localStorage.setItem('wi_codes',JSON.stringify(codesUsed));localStorage.setItem('wi_trk',trk);localStorage.setItem('wi_stars',JSON.stringify(stars));localStorage.setItem('wi_elite',elite?'1':'0');localStorage.setItem('wi_nick',nick);localStorage.setItem('wi_earned',earned);localStorage.setItem('wi_vol',vol)}catch(e){}}
+function item(ic,name,desc,txt,dis,own,key){
+  var d=document.createElement('div');d.className='item'+(own?' own':'');
+  var i=document.createElement('div');i.className='ic';i.textContent=ic;
+  var tx=document.createElement('div');tx.className='tx';
+  var b=document.createElement('b');b.textContent=name;var p=document.createElement('p');p.textContent=desc;
+  tx.appendChild(b);tx.appendChild(p);
+  var bt=document.createElement('button');bt.className='btn';bt.dataset.buy=key;bt.textContent=txt;bt.disabled=dis;
+  d.appendChild(i);d.appendChild(tx);d.appendChild(bt);return d;
+}
+function sec(t){var h=document.createElement('div');h.className='sec';h.textContent=t;return h}
+var LT=[['Hello There','Food and Friends','Everyday Life'],['Questions and Manners','Past and Future','Apostrophes and Commas'],['Long Sentences','Difficult Words','Opinions'],['Numbers and Dates','Quotations','Parentheses'],['Two Sentences','Short Paragraphs','Linking Words'],['Technical Terms','Heavy Punctuation','The Final Test']],ICO=['⌨️','🎮','📖'];
+var SN=['Street Life','Kitchen Table','School Days','Weekend Plans','Because and But','Busy Cities','Travel Tales','Tricky Choices','Dates and Times','Numbers Game','Quote Marks','Brackets','Short Stories','Longer Tales','Newsroom','Letters Home','Science Lab','Big Words','Heavy Punctuation','Grand Finale'];
+var TD=['Longer everyday sentences','Commas and linking words','Numbers, dates, quotes and brackets','Two sentences at a time','Hard words and heavy punctuation'];
+for(var q=6;q<26;q++){LVL.push([SN[q-6],TD[Math.floor((q-6)/4)],1500+(q-6)*500,7+Math.floor((q-6)*0.8)]);LT.push([1,2,3,4,5].map(function(z){return SN[q-6]+' '+z}))}
+var SUB=['The teacher','My neighbour','A young artist','Our captain','The old farmer','Every student','The little dog','Her brother','The baker','A tired traveller','The new doctor','Our grandmother','The mayor','A clever fox','The shy musician'];
+var VP=['painted a small boat','carried the heavy box','read an old letter','repaired the broken clock','followed a narrow path','borrowed three library books','cooked a warm dinner','found a golden key','opened the creaky door','watched the evening news','planted two apple trees','wrote a long message','climbed the tallest hill','cleaned the dusty window','shared a secret recipe','packed a large suitcase'];
+var PL=['near the river','behind the school','in the quiet village','at the end of the street','beside the old bridge','inside the warm kitchen','on a sunny afternoon','under the big oak tree'];
+var TM=['Yesterday','Every morning','After lunch','During the storm','Last winter','Before sunrise','On Saturday','Late at night'];
+var MO=['January','February','March','April','May','June','July','August','September','October','November','December'];
+var QS=['We should leave before it rains','I have never seen anything like it','Please close the door quietly','Let us try again tomorrow','It was the best day of my life'];
+var QQ=['Where did you find this','Have you finished your homework','Who left the window open','Why is everyone so quiet'];
+var PA=['twice this week','as usual','for the first time','again and again','without any help'];
+var AJ=['extraordinary','unprecedented','meticulous','considerable','inevitable','remarkable','comprehensive'];
+var NN=['phenomenon','infrastructure','experiment','negotiation','architecture','environment','investigation'];
+var PP=['examined','documented','investigated','questioned','celebrated','reconsidered'];
+var AD=['thoroughly','carefully','repeatedly','publicly','independently'];
+var NS=['scientists','historians','engineers','journalists','researchers'];
+function R(a){return a[Math.floor(Math.random()*a.length)]}
+function lc(t){return t.charAt(0).toLowerCase()+t.slice(1)}
+function ord(n){var m=n%100,e=n%10;return n+(m>=11&&m<=13?'th':e===1?'st':e===2?'nd':e===3?'rd':'th')}
+function g0(){return R(SUB)+' '+R(VP)+' '+R(PL)+'.'}
+function g1(){return Math.random()<.5?R(TM)+', '+lc(R(SUB))+' '+R(VP)+', '+R(['but','and','so'])+' '+lc(R(SUB))+' '+R(VP)+'.':R(SUB)+' '+R(VP)+' '+R(PL)+' '+R(['because','although','while'])+' '+lc(R(SUB))+' '+R(VP)+'.'}
+function g2(){
+  var k=Math.floor(Math.random()*5),y=1990+Math.floor(Math.random()*36),n=20+Math.floor(Math.random()*960);
+  if(k===0)return 'On '+R(MO)+' '+ord(1+Math.floor(Math.random()*28))+', '+y+', '+lc(R(SUB))+' '+R(VP)+'.';
+  if(k===1)return '"'+R(QS)+',"'+' said '+lc(R(SUB))+'.';
+  if(k===2)return '"'+R(QQ)+'?" asked '+lc(R(SUB))+'.';
+  if(k===3)return R(SUB)+' '+R(VP)+' ('+R(PA)+') '+R(PL)+'.';
+  return 'About '+n+' students joined the club in '+y+'.';
+}
+function g3(){return g2()+' '+g1()}
+function g4(){
+  var k=Math.floor(Math.random()*4),A=R(AJ),N=R(NN);
+  if(k===0)return 'Although the '+A+' '+N+' was '+R(AD)+' '+R(PP)+', the committee\'s conclusions remained '+R(['questionable','controversial','inconclusive'])+'.';
+  if(k===1)return 'The '+N+', which seemed '+A+', was '+R(AD)+' '+R(PP)+' by '+R(NS)+'.';
+  if(k===2)return 'The '+A+' '+N+' surprised everyone; '+R(['however','nevertheless','consequently'])+', '+R(NS)+' '+R(['remained sceptical','stayed cautious','kept asking questions'])+'.';
+  return 'Remember this: the '+A+' '+N+' was '+R(AD)+' '+R(PP)+'.';
+}
+function gen(i){var f=[g0,g1,g2,g3,g4][Math.min(4,Math.floor((i-6)/4))],o=[],n=0;while(o.length<ROUNDS&&n++<80){var x=f();if(o.indexOf(x)<0)o.push(x)}return o}
+
+var ES=['Sharp Start','Rhythm Builders','Clean Hands','Steady Pace','Long Reads','Word Mines','Comma Storm','Quote Hunters','Number Crunch','Bracket Bay','Semicolon Peaks','Story Marathon','Newsdesk Pro','Lab Reports','Formal Letters','Poet Corner','Debate Night','Final Climb','Grand Master','Hall of Fame','Level 200'];
+function doneCount(){var n=0;for(var k in stars)if(k.charAt(0)!=='e'&&stars[k]>=2)n++;return n}
+function factor(l){return l>=100?25+Math.floor((l-100)*.25):LVL[l][3]}
+function genElite(idx){
+  var f=idx===100?function(){return g4()+' '+g4()+' '+g4()}:idx<34?g3:idx<67?g4:function(){return g4()+' '+g4()},o=[],n=0;
+  while(o.length<ROUNDS&&n++<80){var x=f();if(o.indexOf(x)<0)o.push(x)}return o;
+}
+function drawElite(L){
+  var h=document.createElement('div');h.className='stage';
+  if(!elite){
+    h.textContent='🔒 Elite levels 100–200 · buy the Elite Pass in the shop (50000 points and 100 completed lessons: '+Math.min(doneCount(),100)+' / 100)';
+    L.appendChild(h);return;
+  }
+  h.textContent='Elite levels 100–200 · ×25 to ×50 points';L.appendChild(h);
+  for(var st=0;st<21;st++){
+    var sh=document.createElement('div');sh.className='stage';sh.style.fontSize='1rem';sh.textContent=ES[st];L.appendChild(sh);
+    var g=document.createElement('div');g.className='lessons';
+    for(var j=0;j<(st===20?1:5);j++){
+      var idx=st*5+j,n=stars['e-'+idx]||0,open=idx===0||(stars['e-'+(idx-1)]||0)>=2;
+      var b=document.createElement('button');b.className='tile'+(n===5?' plat':'');b.dataset.e=idx;b.disabled=!open;
+      var a=document.createElement('span');a.className='num';a.textContent=100+idx;
+      var ic=document.createElement('span');ic.className='ico';ic.textContent=open?['🏅','🔥','💎'][idx%3]:'🔒';
+      var t=document.createElement('span');t.className='ttl';t.textContent=st===20?'Level 200':ES[st]+' '+(j+1);
+      var sr=document.createElement('span');sr.className='st';sr.textContent=starStr(n);
+      b.appendChild(a);b.appendChild(ic);b.appendChild(t);b.appendChild(sr);
+      if(n>=3){var c=document.createElement('span');c.className='chk';c.textContent='✓';b.appendChild(c)}
+      g.appendChild(b);
+    }
+    L.appendChild(g);
+  }
+}
+
+function starsFor(r){return r>=48?5:r>=42?4:r>=34?3:r>=24?2:r>=10?1:0}
+function starStr(n){return '★★★★★'.slice(0,n)+'☆☆☆☆☆'.slice(0,5-n)}
+function drawLevels(){
+  var L=$('levels'),num=0;L.textContent='';
+  LVL.forEach(function(l,i){
+    if(i>=6&&ownedLv.indexOf(i-1)<0)return;
+    var has=ownedLv.indexOf(i)>-1,h=document.createElement('div');h.className='stage';
+    h.textContent='Level '+(i+1)+' · '+l[0]+(has?' · ×'+l[3]+' points':' · 🔒 unlock in the shop for '+l[2]);L.appendChild(h);if(i>=6&&!has)return;
+    var g=document.createElement('div');g.className='lessons';
+    for(var k=0;k<(i<6?3:5);k++){
+      num++;
+      var st=stars[i+'-'+k]||0,open=has&&(k===0||(stars[i+'-'+(k-1)]||0)>=2);
+      var b=document.createElement('button');b.className='tile'+(st===5?' plat':'');b.dataset.l=i;b.dataset.k=k;b.disabled=!open;
+      var n=document.createElement('span');n.className='num';n.textContent=num;
+      var ic=document.createElement('span');ic.className='ico';ic.textContent=open?ICO[k%3]:'🔒';
+      var t=document.createElement('span');t.className='ttl';t.textContent=LT[i][k];
+      var sr=document.createElement('span');sr.className='st';sr.textContent=starStr(st);
+      b.appendChild(n);b.appendChild(ic);b.appendChild(t);b.appendChild(sr);
+      if(st>=3){var c=document.createElement('span');c.className='chk';c.textContent='✓';b.appendChild(c)}
+      g.appendChild(b);
+    }
+    L.appendChild(g);
+  });
+  drawElite(L);
+}
+function drawShop(){
+  $('coins').textContent=coins;$('mult').textContent=inc?'×'+mult():'';
+  $('badges').textContent=M.filter(function(m,i){return owned.indexOf(i)>-1}).map(function(m){return m[0]}).join(' ');
+  var sh=$('shop');sh.textContent='';
+  sh.appendChild(sec('Levels'));
+  LVL.forEach(function(l,i){if(i>=6&&ownedLv.indexOf(i-1)<0)return;var has=ownedLv.indexOf(i)>-1;
+    sh.appendChild(item(['🟢','🟡','🟠','🔴','🟣','⭐','🔵','🟤','⚫','⚪','🔷','🔶','💠','🌟'][i<6?i:6+(i%8)],l[0],l[1]+'. Gives ×'+l[3]+' points per round.',has?'Unlocked ✓':'Buy for '+l[2],has||coins<l[2],has,'l'+i))});
+  sh.appendChild(sec('Elite pass'));
+  var dc=doneCount();
+  sh.appendChild(item('🏅','Elite Pass','Unlocks levels 100–200 with huge point bonuses. Needs 100 completed lessons ('+Math.min(dc,100)+' / 100) and 50000 points.',elite?'Owned ✓':'Buy for 50000',elite||dc<100||coins<50000,elite,'e0'));
+  sh.appendChild(sec('Income upgrades'));
+  INC.forEach(function(u,i){var has=inc>i,ready=inc===i;
+    sh.appendChild(item(u[0],u[1],u[2],has?'Owned ✓':'Buy for '+u[3],has||!ready||coins<u[3],has,'u'+i))});
+  sh.appendChild(sec('Milestones'));
+  M.forEach(function(m,i){var has=owned.indexOf(i)>-1;
+    sh.appendChild(item(m[0],m[1],m[2],has?'Owned ✓':'Buy for '+m[3],has||coins<m[3],has,'m'+i))});
+  drawLevels();
+}
+$('shop').addEventListener('click',function(e){
+  var b=e.target.closest('button');if(!b||b.disabled)return;
+  var k=b.dataset.buy,t=k[0],i=+k.slice(1);
+  if(t==='m'&&coins>=M[i][3]&&owned.indexOf(i)<0){coins-=M[i][3];owned.push(i)}
+  else if(t==='l'&&coins>=LVL[i][2]&&ownedLv.indexOf(i)<0&&(i<6||ownedLv.indexOf(i-1)>-1)){coins-=LVL[i][2];ownedLv.push(i)}
+  else if(t==='u'&&inc===i&&coins>=INC[i][3]){coins-=INC[i][3];inc++}
+  else if(t==='e'&&!elite&&doneCount()>=100&&coins>=50000){coins-=50000;elite=true}
+  else return;
+  save();drawShop();
+});
+document.querySelector('.nav').addEventListener('click',function(e){
+  var b=e.target.closest('.tab');if(!b)return;
+  ['g','s','t','a','l'].forEach(function(k){var on=b.dataset.tab===k;$('t-'+k).setAttribute('aria-selected',on);$('p-'+k).hidden=!on});
+});
+var ROUNDS=5,lvl,tasks,rd,pts,tChars,tTime,tErr,cur,t0,errs,prev;
+function $(i){return document.getElementById(i)}
+function show(id){['start','game','end'].forEach(function(k){$(k).hidden=k!==id})}
+function shuffle(a){return a.slice().sort(function(){return Math.random()-.5})}
+document.querySelector('.levels').addEventListener('click',function(e){
+  var b=e.target.closest('button');if(!b||b.disabled)return;
+  if(b.dataset.e!==undefined){lvl=100+(+b.dataset.e);kk=0}else{lvl=+b.dataset.l;kk=+b.dataset.k}tasks=lvl>=100?genElite(lvl-100):lvl<6?shuffle(S[lvl]).slice(0,ROUNDS):gen(lvl);rd=0;pts=0;raw=0;tChars=0;tTime=0;tErr=0;show('game');load();
+});
+function paint(v){
+  var h=$('target');h.textContent='';
+  for(var i=0;i<cur.length;i++){
+    var s=document.createElement('span');s.textContent=cur[i];
+    if(i<v.length)s.className=v[i]===cur[i]?'ok':'bad';else if(i===v.length)s.className='cur';
+    h.appendChild(s);
+  }
+}
+function load(){
+  cur=tasks[rd];errs=0;prev=0;t0=0;
+  $('fb').hidden=true;
+  $('rn').textContent=(rd+1)+' / '+ROUNDS;$('pts').textContent=pts;$('bar').style.width=(rd/ROUNDS*100)+'%';
+  var a=$('ans');a.value='';a.disabled=false;a.maxLength=cur.length;paint('');a.focus();
+}
+$('ans').addEventListener('paste',function(e){e.preventDefault()});
+$('ans').addEventListener('input',function(){
+  var v=this.value;
+  if(!t0&&v.length)t0=Date.now();
+  if(v.length>prev&&v[v.length-1]!==cur[v.length-1])errs++;
+  prev=v.length;paint(v);
+  if(v===cur){
+    var min=Math.max((Date.now()-t0)/60000,.0017),wpm=Math.round(cur.length/5/min),p=Math.max(0,10-errs);
+    var g=Math.round(p*factor(lvl)*mult());raw+=p;pts+=g;coins+=g;earned+=g;save();drawShop();pushScore();tChars+=cur.length;tTime+=min;tErr+=errs;
+    this.disabled=true;$('pts').textContent=pts;
+    $('s1').textContent=g;$('s2').textContent=wpm;$('s3').textContent=errs;
+    $('next').textContent=rd===ROUNDS-1?'See results':'Next sentence';
+    $('fb').hidden=false;$('next').focus();
+  }
+});
+$('next').addEventListener('click',function(){
+  rd++;
+  if(rd>=ROUNDS){
+    var acc=Math.round(tChars/(tChars+tErr)*100),wpm=Math.round(tChars/5/tTime);
+    $('e1').textContent=pts;$('e2').textContent=wpm;$('e3').textContent=acc+' %';
+    var sn=starsFor(raw),key=lvl>=100?'e-'+(lvl-100):lvl+'-'+kk;if(sn>(stars[key]||0))stars[key]=sn;save();drawLevels();pushScore();
+    $('e4').textContent=starStr(sn)+'  '+sn+' out of 5 stars'+(sn<2?'. Get at least 2 stars to unlock the next lesson.':((lvl>=100?lvl<200:kk<(lvl<6?2:4))?'. Next lesson unlocked!':'.'));
+    $('verdict').textContent=raw>=45?'Almost perfect! Your spelling and speed are spot on.':raw>=32?'Great job! Try to type a little more accurately.':'Good start. Keep practising and you will get faster and more accurate.';
+    show('end');
+  }else load();
+});
+drawShop();
+var CODES={'lnf9h0sm2cju':100,'kj5ukk1qoi4no':250,'1aobrod4kxsnr':500,'wnabb5128igv9':1000,'uti1vo1bdp5aq':2000,'mew6cu1vsa9ou':5000};
+function hh(str){var h=2166136261,g=5381;for(var i=0;i<str.length;i++){var c=str.charCodeAt(i);h^=c;h=Math.imul(h,16777619)>>>0;g=((g*33)^c)>>>0}return h.toString(36)+g.toString(36)}
+var fails=0,lockUntil=0;
+function redeem(){
+  var m=$('cmsg'),c=$('code').value.toUpperCase().replace(/[^A-Z0-9]/g,'');
+  if(Date.now()<lockUntil){m.textContent='Too many attempts. Wait '+Math.ceil((lockUntil-Date.now())/1000)+' seconds.';return}
+  if(!c){m.textContent='Enter a code first.';return}
+  if(hh('adm|'+c)===ADM){unlockAdmin();$('code').value='';m.textContent='Admin mode unlocked.';return}
+  if(codesUsed.indexOf(c)>-1){m.textContent='You have already used this code.';return}
+  var k=hh('wi26|'+c);
+  if(!CODES.hasOwnProperty(k)){fails++;if(fails>=3){fails=0;lockUntil=Date.now()+15000;m.textContent='Invalid code. Wait 15 seconds before trying again.'}else m.textContent='Invalid code.';return}
+  fails=0;coins+=CODES[k];codesUsed.push(c);save();drawShop();$('code').value='';
+  m.textContent='Code accepted! You got '+CODES[k]+' points.';
+}
+var ADM='1jfluz1nujevd';
+function adminStat(){
+  var n=0;for(var k in stars)n+=stars[k];
+  $('astat').textContent='Points: '+coins+' · Levels owned: '+ownedLv.length+' / '+LVL.length+' · Milestones: '+owned.length+' / '+M.length+' · Stars: '+n;
+}
+function showAdmin(){$('t-a').hidden=false;adminStat()}
+function unlockAdmin(){try{localStorage.setItem('wi_admin','1')}catch(e){}showAdmin()}
+function amsg(t){$('amsg').textContent=t;adminStat()}
+$('aadd').addEventListener('click',function(){var n=Math.max(0,Math.floor(+$('aamt').value)||0);coins+=n;save();drawShop();amsg('Added '+n+' points.')});
+$('aunl').addEventListener('click',function(){
+  ownedLv=LVL.map(function(l,i){return i});inc=INC.length;elite=true;owned=M.map(function(m,i){return i});save();drawShop();amsg('Everything unlocked.');
+});
+$('astr').addEventListener('click',function(){
+  LVL.forEach(function(l,i){for(var k=0;k<(i<6?3:5);k++)stars[i+'-'+k]=5});for(var e=0;e<=100;e++)stars['e-'+e]=5;save();drawShop();amsg('All lessons set to 5 stars.');
+});
+var rt=0;
+$('arst').addEventListener('click',function(){
+  var b=this;
+  if(!rt){b.textContent='Click again to confirm';rt=setTimeout(function(){rt=0;b.textContent='Reset progress'},3000);return}
+  clearTimeout(rt);rt=0;b.textContent='Reset progress';
+  coins=0;owned=[];ownedLv=[0];inc=0;stars={};elite=false;earned=0;codesUsed=[];save();pushScore();drawShop();amsg('Progress reset.');
+});
+$('ggen').addEventListener('click',function(){
+  var c=$('gcode').value.toUpperCase().replace(/[^A-Z0-9]/g,''),n=Math.floor(+$('gpts').value)||0;
+  $('gout').value=(c&&n>0)?"'"+hh('wi26|'+c)+"':"+n:'Enter a code and points first.';
+});
+$('alock').addEventListener('click',function(){
+  try{localStorage.removeItem('wi_admin')}catch(e){}
+  $('t-a').hidden=true;$('p-a').hidden=true;$('t-g').click();
+});
+try{if(localStorage.getItem('wi_admin')==='1')showAdmin()}catch(e){}
+var dbh=null,uid=null,isOwn=false,wr=false,dirty=false,lbOn=false;
+function lbm(t){$('lbmsg').textContent=t}
+function lessonsDone(){var n=0;for(var k in stars)if(stars[k]>=2)n++;return n}
+async function pushScore(){
+  if(!dbh||!uid||!nick)return;
+  if(wr){dirty=true;return}
+  wr=true;
+  try{await dbh.doc('scores/'+uid).set({name:nick,earned:earned,lessons:lessonsDone()})}
+  catch(e){lbm('Could not save your score ('+((e&&e.code)||'error')+').')}
+  wr=false;
+  if(dirty){dirty=false;pushScore()}
+}
+function drawBoard(snap){
+  var ol=$('lblist');ol.textContent='';
+  if(snap.empty){var e=document.createElement('li');e.textContent='No players yet. Be the first to join!';ol.appendChild(e);return}
+  snap.docs.forEach(function(d,i){
+    var v=d.data()||{},li=document.createElement('li');if(d.id===uid)li.className='me';
+    var rk=document.createElement('span');rk.className='rk';rk.textContent=i+1;
+    var nm=document.createElement('span');nm.className='nm';nm.textContent=String(v.name||'Player')+(d.id===uid?' (you)':'');
+    var sc=document.createElement('span');sc.className='sc';sc.textContent=(v.earned||0)+' points · '+(v.lessons||0)+' lessons';
+    li.appendChild(rk);li.appendChild(nm);li.appendChild(sc);
+    if(isOwn){var b=document.createElement('button');b.className='rm';b.textContent='✕';b.title='Remove this player';b.dataset.rm=d.id;li.appendChild(b)}
+    ol.appendChild(li);
+  });
+}
+$('lblist').addEventListener('click',function(e){
+  var b=e.target.closest('button');if(!b||!b.dataset.rm||!dbh)return;
+  dbh.doc('scores/'+b.dataset.rm).delete().catch(function(){lbm('Could not remove that player.')});
+});
+$('nick').value=nick;
+$('join').addEventListener('click',function(){
+  var v=$('nick').value.trim();
+  if(!dbh){lbm('The leaderboard is only available when you are signed in to Claude.');return}
+  if(!uid){lbm('You need to be signed in to Claude to join.');return}
+  if(v.length<2){lbm('Your nickname needs at least 2 characters.');return}
+  nick=v;save();lbm('You joined the leaderboard!');pushScore();
+});
+function startBoard(){
+  if(lbOn||!dbh)return;lbOn=true;
+  var tm=setTimeout(function(){lbm('Still trying to reach the leaderboard…')},10000);
+  dbh.collection('scores').orderBy('earned','desc').limit(20).onSnapshot(function(snap){clearTimeout(tm);if(lbm.t)lbm('');drawBoard(snap)},function(){clearTimeout(tm);lbm('The leaderboard could not be loaded.')});
+}
+if(window.claude&&claude.use){
+  claude.use('db').then(function(d){
+    if(!d){$('lbinfo').textContent='The leaderboard is only available when you are signed in to Claude.';return}
+    dbh=d;
+    return claude.use('user').then(function(u){
+      if(!u)return;
+      return Promise.all([u.id(),u.isOwner(),u.can('data.write')]).then(function(r){
+        uid=r[0];isOwn=r[1];
+        if(r[2]===false)$('lbinfo').textContent='You can see the leaderboard, but you need Contributor access to join it.';
+      });
+    });
+  }).then(function(){startBoard();pushScore()}).catch(function(){});
+}
+$('redeem').addEventListener('click',redeem);
+$('code').addEventListener('keydown',function(e){if(e.key==='Enter')redeem()});
+var TR=[{n:'Calm',w:'sine',bpm:84,g:1,m:[0,4,7,12,7,4,9,5,0,4,7,11,7,4,2,null]},
+ {n:'Upbeat',w:'triangle',bpm:132,g:1,m:[0,4,7,4,9,7,4,0,2,5,9,5,12,9,5,2]},
+ {n:'Retro',w:'square',bpm:150,g:.45,m:[0,0,7,7,9,9,7,null,5,5,4,4,2,2,0,null]}];
+var AC=null,mg=null,tm=null,st=0,mon=false;
+function note(n){
+  if(n===null||!AC)return;
+  var t=TR[trk],o=AC.createOscillator(),g=AC.createGain(),now=AC.currentTime;
+  o.type=t.w;o.frequency.value=262*Math.pow(2,n/12);
+  g.gain.setValueAtTime(.0001,now);g.gain.exponentialRampToValueAtTime(.4*t.g,now+.02);g.gain.exponentialRampToValueAtTime(.0001,now+.45);
+  o.connect(g);g.connect(mg);o.start(now);o.stop(now+.5);
+}
+function setVol(){if(mg)mg.gain.value=vol/100*.5}
+function startMusic(){
+  try{
+    if(!AC){AC=new (window.AudioContext||window.webkitAudioContext)();mg=AC.createGain();mg.connect(AC.destination)}
+    if(AC.resume)AC.resume();setVol();
+  }catch(e){return}
+  clearInterval(tm);st=0;mon=true;
+  tm=setInterval(function(){var m=TR[trk].m;note(m[st%m.length]);st++},60000/TR[trk].bpm/2);
+  $('mtog').textContent='Stop music';
+}
+function stopMusic(){clearInterval(tm);mon=false;$('mtog').textContent='Play music'}
+function drawTracks(){
+  var d=$('tracks');d.textContent='';
+  TR.forEach(function(t,i){var b=document.createElement('button');b.className='opt';b.dataset.t=i;b.textContent=t.n;b.setAttribute('aria-pressed',i===trk);d.appendChild(b)});
+}
+$('tracks').addEventListener('click',function(e){
+  var b=e.target.closest('button');if(!b)return;
+  trk=+b.dataset.t;save();drawTracks();startMusic();
+});
+$('mtog').addEventListener('click',function(){mon?stopMusic():startMusic()});
+$('vol').value=vol;
+$('vol').addEventListener('input',function(){vol=+this.value;setVol();save()});
+drawTracks();
+$('again').addEventListener('click',function(){show('start')});
+</script>
+</body>
+</html>
